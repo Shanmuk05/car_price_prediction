@@ -1,4 +1,5 @@
-const API_BASE = "http://localhost:8000";
+const _raw = (import.meta.env.VITE_API_URL as string) || "http://localhost:8000";
+const API_BASE = _raw.startsWith("http") ? _raw : `https://${_raw}`;
 
 export interface CarInput {
   symboling: number;

@@ -1,0 +1,29 @@
+# One-click deploy: Render → New → Blueprint → pick this repo → Apply
+# Creates the prediction API and the React frontend, and points the
+# frontend at the API automatically.
+services:
+  - type: web
+    name: carprice-api
+    runtime: python
+    plan: free
+    rootDir: Backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+
+  - type: web
+    name: carprice-web
+    runtime: static
+    rootDir: Frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: carprice-api
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
