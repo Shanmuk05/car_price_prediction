@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Car Price Prediction — Atchutha Sai Kiran</title>
+<meta name="description" content="Predict car prices with Linear Regression, Decision Tree and Random Forest — running entirely in your browser." />
+<meta name="theme-color" content="#0b1a12" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#f4f1e8;--soft:rgba(244,241,232,.72);--faint:rgba(244,241,232,.46);--gold:#f6c56b;--gold2:#e39b3c;--moss:#9fd8a5;--glass:rgba(10,24,18,.55);--line:rgba(255,255,255,.14);--serif:"Fraunces",Georgia,serif;--sans:"Manrope",system-ui,sans-serif;--mono:"JetBrains Mono",monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);line-height:1.6;min-height:100vh;
+background:radial-gradient(ellipse at 70% -10%,#1c3a2a,transparent 55%),linear-gradient(180deg,#0c1d14 0%,#0a1912 55%,#06100b 100%);background-attachment:fixed}
+a{color:var(--gold)}
+.wrap{max-width:1060px;margin:0 auto;padding:clamp(24px,5vw,56px) clamp(16px,4vw,32px)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.back{font:600 13px var(--mono);color:var(--soft);text-decoration:none;border:1px solid var(--line);padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.05)}
+.back:hover{background:rgba(255,255,255,.12)}
+.tag{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:28px 0 10px}
+h1{font-family:var(--serif);font-weight:800;font-size:clamp(34px,6vw,62px);line-height:1.02;letter-spacing:-.02em}
+h1 em{font-style:italic;font-weight:300;background:linear-gradient(100deg,#fff6dc,var(--gold) 45%,#ff9f6e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--soft);max-width:640px;margin-top:14px;font-size:17px}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.panel{padding:clamp(20px,3vw,34px);margin-top:28px}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.ph h2{font-family:var(--serif);font-weight:600;font-size:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;font:600 15px var(--sans);cursor:pointer;border:1px solid transparent;transition:transform .2s,box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{color:#1a1205;background:linear-gradient(135deg,#ffe0a0,var(--gold) 45%,var(--gold2));box-shadow:0 10px 30px -8px rgba(246,170,80,.6)}
+.btn-ghost{color:var(--ink);background:rgba(255,255,255,.06);border-color:var(--line);font-size:13px;padding:9px 15px}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px 18px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.field input,.field select{font:500 15px var(--sans);color:var(--ink);background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field select option{background:#0c1d14}
+.sub{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--moss);margin:22px 0 2px;grid-column:1/-1}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;align-items:center}
+.results{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:4px}
+.res{padding:20px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);text-align:center;position:relative;overflow:hidden}
+.res.best{border-color:rgba(246,197,107,.6);background:rgba(246,197,107,.08)}
+.res .m{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.res .p{font-family:var(--serif);font-weight:800;font-size:clamp(26px,4vw,38px);color:var(--gold);margin-top:8px;letter-spacing:-.01em}
+.res .note{font-size:12px;color:var(--faint);margin-top:6px}
+.badge{position:absolute;top:10px;right:10px;font:600 10px var(--mono);background:var(--gold);color:#1a1205;padding:3px 8px;border-radius:999px}
+.muted{color:var(--faint);font-size:13px}
+.foot{margin-top:40px;text-align:center;font:500 12px var(--mono);color:var(--faint)}
+.loading{color:var(--soft);font-size:15px;padding:20px 0}
+@media(max-width:640px){.results{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="https://shanmuk05.github.io">← Back to portfolio</a>
+    <a class="back" href="https://github.com/Shanmuk05/car_price_prediction" target="_blank" rel="noopener">⌥ Source code ↗</a>
+  </div>
+
+  <p class="tag">Machine Learning · runs in your browser</p>
+  <h1>Car Price <em>Prediction</em></h1>
+  <p class="lede">Enter a car's specifications and three trained models — Linear Regression, Decision Tree and Random Forest — estimate its price. The models were trained in Python on the UCI Automobile dataset and exported to run entirely client-side, so nothing is sent to a server.</p>
+
+  <form class="glass panel" id="form">
+    <div class="ph">
+      <h2>Car specifications</h2>
+      <button type="button" class="btn btn-ghost" id="example">↺ Load example (BMW)</button>
+    </div>
+    <div class="grid" id="fields"><div class="loading">Loading models…</div></div>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary" id="go">Predict price →</button>
+      <span class="muted" id="status"></span>
+    </div>
+  </form>
+
+  <div class="glass panel" id="out" style="display:none">
+    <div class="ph"><h2>Estimated price</h2><span class="muted">USD</span></div>
+    <div class="results" id="results"></div>
+    <p class="muted" style="margin-top:16px">Random Forest is usually the most reliable here — it averages 200 decision trees. Prices reflect the dataset's era and currency.</p>
+  </div>
+
+  <p class="foot">Built by Atchutha Sai Kiran · models exported from scikit-learn, inference in pure JavaScript</p>
+</div>
+
+<script src="predict.js"></script>
+<script>
+const NUM_META = [
+  ['symboling','Symboling',0,'',-3,3],['normalized-losses','Normalized losses',122,''],
+  ['wheel-base','Wheel base',98.8,'in'],['length','Length',174,'in'],['width','Width',65.9,'in'],
+  ['height','Height',53.8,'in'],['curb-weight','Curb weight',2555,'lb'],['engine-size','Engine size',127,'cc'],
+  ['bore','Bore',3.33,''],['stroke','Stroke',3.26,''],['compression-ratio','Compression ratio',10.1,''],
+  ['horsepower','Horsepower',104,'hp'],['peak-rpm','Peak RPM',5125,'rpm'],['city-mpg','City MPG',25,''],['highway-mpg','Highway MPG',30,'']
+];
+const CAT_LABELS = {make:'Make','fuel-type':'Fuel type',aspiration:'Aspiration','num-of-doors':'Doors','body-style':'Body style','drive-wheels':'Drive wheels','engine-location':'Engine location','engine-type':'Engine type','num-of-cylinders':'Cylinders','fuel-system':'Fuel system'};
+const CAT_ORDER = ['make','fuel-type','aspiration','num-of-doors','body-style','drive-wheels','engine-location','engine-type','num-of-cylinders','fuel-system'];
+const EXAMPLE = {symboling:0,"normalized-losses":122,make:"bmw","fuel-type":"gas",aspiration:"std","num-of-doors":"four","body-style":"sedan","drive-wheels":"rwd","engine-location":"front","wheel-base":101.2,length:176.8,width:64.8,height:54.3,"curb-weight":2395,"engine-type":"ohc","num-of-cylinders":"four","engine-size":108,"fuel-system":"mpfi",bore:3.5,stroke:2.8,"compression-ratio":8.8,horsepower:101,"peak-rpm":5800,"city-mpg":23,"highway-mpg":29};
+
+let MODEL=null, CATS=null;
+const $=s=>document.querySelector(s);
+const fmt=n=>'$'+Math.max(0,Math.round(n)).toLocaleString('en-US');
+
+Promise.all([
+  fetch('model.json').then(r=>r.json()),
+  fetch('cats.json').then(r=>r.json())
+]).then(([m,c])=>{ MODEL=m; CATS=c; buildForm(); })
+ .catch(e=>{ $('#fields').innerHTML='<p class="loading">Could not load the model files. Please refresh.</p>'; });
+
+function buildForm(){
+  const F=$('#fields'); F.innerHTML='';
+  const sub=t=>{const d=document.createElement('div');d.className='sub';d.textContent=t;F.appendChild(d);};
+  sub('Numbers');
+  NUM_META.forEach(([key,label,def,unit,min,max])=>{
+    const w=document.createElement('div');w.className='field';
+    w.innerHTML=`<label>${label}${unit?` (${unit})`:''}</label><input type="number" step="any" name="${key}" value="${def}"${min!=null?` min="${min}"`:''}${max!=null?` max="${max}"`:''}>`;
+    F.appendChild(w);
+  });
+  sub('Categories');
+  CAT_ORDER.forEach(key=>{
+    const opts=(CATS[key]||[]).slice().sort();
+    const w=document.createElement('div');w.className='field';
+    w.innerHTML=`<label>${CAT_LABELS[key]||key}</label><select name="${key}">${opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
+    F.appendChild(w);
+  });
+  setValues(EXAMPLE);
+  $('#status').textContent='Ready — adjust values and predict.';
+}
+function setValues(obj){ Object.entries(obj).forEach(([k,v])=>{const el=$(`[name="${CSS.escape(k)}"]`); if(el) el.value=v;}); }
+function readInput(){ const o={}; document.querySelectorAll('#fields [name]').forEach(el=>{ o[el.name]=el.type==='number'?Number(el.value):el.value; }); return o; }
+
+$('#example').onclick=()=>{ setValues(EXAMPLE); $('#status').textContent='Loaded BMW example.'; };
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!MODEL){return;}
+  const r=predict(readInput(),MODEL);
+  const rows=[['Linear Regression',r.linear_regression],['Decision Tree',r.decision_tree],['Random Forest',r.random_forest]];
+  const best='Random Forest';
+  $('#results').innerHTML=rows.map(([m,v])=>`<div class="res${m===best?' best':''}">${m===best?'<span class="badge">recommended</span>':''}<div class="m">${m}</div><div class="p">${fmt(v)}</div></div>`).join('');
+  $('#out').style.display='';
+  $('#out').scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+</script>
+</body>
+</html>
